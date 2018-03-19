@@ -1,6 +1,9 @@
 let bamboos = [];
 let pandas = [];
 
+let button = 0;
+let position = 0;
+
 
 function setup() {
 	createCanvas(windowWidth-50,windowHeight-50);
@@ -31,7 +34,7 @@ class panda {
 	}
 	
 	closeMouth() {
-		this.open = false;
+		this.open = false;	
 	}
 	
 	left() {
@@ -49,6 +52,7 @@ class panda {
 	}
 	
 	render() {
+		position = this.loc.x;
 		stroke(20);
 		strokeWeight(size/100);	
 		fill(240);
@@ -87,7 +91,7 @@ class bamboo {
 	}
 
 	chomp(position) {
-		if (abs(this.loc.x - position) < width/30) {
+		if (abs(this.loc.x + (			this.sectionHeight/10) - position) < width/30) {
 			this.age = 1;
 			this.depth = random(-3,3);
 			this.angle = random(-1*QUARTER_PI,QUARTER_PI)*0.1;
@@ -126,6 +130,23 @@ class bamboo {
 }
 
 
+function mousePressed() {
+	//TODO: this could be a single int division, but readability or something? //Nevermind?
+	if (mouseX < position - width/20) {
+		button = 1;
+	}	
+	else if (mouseX > position - width/20 && mouseX < position + width/20) {
+		button = 2;
+	}
+	else if (mouseX > position + width/20) {
+		button = 3;
+	}
+}
+
+function mouseReleased() {
+		button = 0;
+}
+
 function draw() {
 	erase();
 	
@@ -133,18 +154,18 @@ function draw() {
 		bamboo.render();
 	}
 	for (panda of pandas){
-		if (keyIsDown(32)) {
+		if (keyIsDown(32) || button == 2) {
 			panda.openMouth();
 			for (bamboo of bamboos){
 				//console.log(panda.loc.x);
 				bamboo.chomp(panda.loc.x);
 			}
 		}
-		else if (keyIsDown(LEFT_ARROW)) {
+		else if (keyIsDown(LEFT_ARROW) || button == 1) {
 			panda.left();
 			panda.closeMouth();
 		}
-		else if (keyIsDown(RIGHT_ARROW)) {
+		else if (keyIsDown(RIGHT_ARROW) || button == 3) {
 			panda.right();
 			panda.closeMouth();
 		}
@@ -154,5 +175,7 @@ function draw() {
 		panda.render();
 	}
 	
+	
+	//console.log(getFrameRate());		
 	
 }
